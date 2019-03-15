@@ -1,0 +1,23 @@
+% residual inverse_iteration
+n = 2; F = @(z) [exp(1i*z.^2) 1; 1 1];
+Fp = @(z) [2i*z*exp(1i*z.^2) 0; 0 0];
+tol = 1e-10; maxit = 100000;
+v = [1;1];  u = [0; 1]; lam_k = 10;
+sig=  10;
+err=[]
+for k = 0:maxit-1
+if norm(F(lam_k)*v) < tol, break; end
+leftvector=u'/F(sig);
+f=leftvector*F(lam_k)*v
+J= leftvector*Fp(lam_k)*v
+h= -f/J
+lam_k = lam_k+h
+[L,U]=lu(F(sig)) 
+r= F(lam_k)*v
+dv=U\(L\r)
+v = v- dv
+v=v/(u'*v)
+err=[err norm(F(lam_k)*v)]
+end
+if k < maxit, nbr_iter = k, lambda = lam_k, end
+semilogy(err,'--*')
